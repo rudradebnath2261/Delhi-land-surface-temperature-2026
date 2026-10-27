@@ -12,25 +12,79 @@ Landsat imagery was processed using cloud masking, radiometric quality filtering
 
 The methodology includes the following calculations:
 
-**1. Land Surface Temperature (LST)**
+## Mathematical Formulas Used
 
-`LST (°C) = (ST_B10 × 0.00341802 + 149.0) − 273.15`
+The following mathematical formulas were applied to analyze urban thermal conditions across Delhi during summer 2026.
 
-**2. Urban Heat Island (UHI) Anomaly**
+### 1. Land Surface Temperature (LST)
 
-`UHI = LST_pixel − Mean LST`
+$$
+LST\ (^\circ C)=(ST_{B10}\times0.00341802)+149.0-273.15
+$$
 
-**3. Surface Urban Heat Island (SUHI) Intensity**
+**Source:** USGS Landsat Collection 2 Level-2 Surface Temperature.
 
-`SUHI = Mean LST_built-up − Mean LST_vegetation`
+### 2. Urban Heat Island (UHI) Temperature Anomaly
 
-**4. Urban Thermal Field Variance Index (UTFVI)**
+$$
+UHI_i=LST_i-\overline{LST}
+$$
 
-`UTFVI = (LST_pixel − Mean LST) / Mean LST`
+Where \(\overline{LST}\) represents the mean land surface temperature of Delhi.
 
-**5. Heat Hotspot Identification**
+### 3. Surface Urban Heat Island (SUHI) Intensity
 
-`Hotspot Threshold = Mean LST + (0.5 × Standard Deviation)`
+$$
+SUHI=\overline{LST}_{Built-up}-\overline{LST}_{Vegetation}
+$$
+
+For spatial mapping of individual built-up pixels:
+
+$$
+SUHI_i=LST_i-\overline{LST}_{Vegetation}
+$$
+
+### 4. Urban Thermal Field Variance Index (UTFVI)
+
+$$
+UTFVI_i=\frac{LST_i-\overline{LST}}{\overline{LST}}
+$$
+
+*The implementation uses LST in degrees Celsius.*
+
+### 5. UHI Intensity Classification
+
+$$
+T=\mu\pm k\sigma
+$$
+
+Where:
+
+- \(\mu\) = Mean land surface temperature.
+- \(\sigma\) = Standard deviation of land surface temperature.
+- \(k\) = 0.5 or 1.5, depending on the classification threshold.
+
+### 6. Heat Hotspot Identification
+
+$$
+Hotspot_i=
+\begin{cases}
+1, & LST_i\geq\mu+0.5\sigma\\
+0, & LST_i<\mu+0.5\sigma
+\end{cases}
+$$
+
+### 7. Minimum and Maximum Index Values
+
+$$
+Index_{min}=\min(X_1,X_2,\ldots,X_n)
+$$
+
+$$
+Index_{max}=\max(X_1,X_2,\ldots,X_n)
+$$
+
+These formulas were implemented in **Google Earth Engine (JavaScript)** to generate LST, UHI, SUHI, UTFVI, thermal classification, heat hotspot maps, and statistical bar graphs.
 
 UHI intensity was classified into five categories using mean temperature and standard deviation, while UTFVI was categorized into six ecological classes, ranging from excellent to worst. The UTFVI calculation followed the published Celsius-based convention.
 
